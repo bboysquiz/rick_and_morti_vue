@@ -1,27 +1,15 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useCharactersStore } from './stores/CharactersStore';
 
 const search = ref('');
 const status = ref('');
-const characters = ref([
-  {
-    id: 1,
-    name: "Rick Sanchez",
-    "status": "Unknown",
-  },
-  {
-    id: 2,
-    name: "Morty Smith",
-    "status": "Dead",
-  },
-  {
-    id: 3,
-    name: "Summer Smith",
-    "status": "Alive",
-  }
-]);
+const characters = useCharactersStore()
+onMounted(async () => {
+  await characters.getCharacters();
+});
 const filteredCharacters = computed(() => {
-  let filteredChars = characters.value;
+  let filteredChars = characters.characters;
 
   if (search.value) {
     filteredChars = filteredChars.filter(character =>
