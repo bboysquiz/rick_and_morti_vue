@@ -4,7 +4,10 @@
         <p>Premiere Date: {{ episodeData.air_date }}</p>
         <div>
             <div v-for="character in charactersInEpisode" :key="character.id">
-                {{ character.id }}
+                <router-link :to="{ name: 'character', params: { id: character.id } }">
+                    <img :src="character.image" alt="character image">
+                    {{ character.name }}
+                </router-link>
             </div>
         </div>
         Episode
@@ -20,46 +23,29 @@ import axios from 'axios';
 const { params } = useRoute();
 const characters = useCharactersStore();
 const episodeData = ref([])
-const idsCharInEpisode = ref([])
+const charactersInEpisode = ref([]);
 
 onMounted(async () => {
-    await axios
-        .get(`https://rickandmortyapi.com/api/episode/${params.id}`)
-        .then((response) => {
-            episodeData.value = response.data
-            idsCharInEpisode.value = episodeData.value.characters.map(link => link.match(/\d+/).toString())
-            // console.log(`${episodeData.value} - episodeData.value`)
-            // console.log(`${idsCharInEpisode.value} - idsCharInEpisode.value`)
-            // console.log(`${characters.characters} - characters.characters`)
+    try {
+        const episodeResponse = await axios.get(`https://rickandmortyapi.com/api/episode/${params.id}`);
+        episodeData.value = episodeResponse.data;
 
-        })
-        .catch((error) => {
-            console.log(error)
-        });
-});
+        const charIds = episodeData.value.characters.map(url => url.match(/\d+/)[0]);
 
-const charactersInEpisode = computed(() => {
-    idsCharInEpisode.value = idsCharInEpisode.value.map(el => {
-        return Number.parseInt(el)
-    })
-    // console.log(characters.characters.filter(character => idsCharInEpisode.value.includes(Number.parseInt(JSON.stringify(character.id)))))
-    // return characters.characters.filter(character => idsCharInEpisode.value.includes(Number.parseInt(JSON.stringify(character.id))))
-    characters.characters.forEach(el => {
-        console.log(el)
-        idsCharInEpisode.value.forEach(id => {
-            // console.log(`${el.id} - el.id и ${id} - id ${el.id === id ? 'true' : 'false'} `)
-            if((JSON.stringify(el.id)) == Number.parseInt(JSON.stringify(id))){
-                
-                // console.log(``)
-                // console.log(`${JSON.stringify(el.id)} - element`)
+        // Загрузка персонажей по ID, если их нет в хранилище
+        for (const id of charIds) {
+            const char = characters.characters.find(c => c.id === Number(id));
+            if (!char) {
+                const response = await axios.get(`https://rickandmortyapi.com/api/character/${id}`);
+                charactersInEpisode.value.push(response.data);
+            } else {
+                charactersInEpisode.value.push(char);
             }
-        })
-    })
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
 });
-
-
-const goToCharacter = (characterId) => {
-    // Навигация на страницу персонажа
-};
 </script>
   

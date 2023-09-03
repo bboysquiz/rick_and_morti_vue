@@ -1,25 +1,25 @@
 <template>
     <div>
-        <h2>{{ character.name }}</h2>
-        <p>{{ character.species }}</p>
-        <img :src="character.image" :alt="character.name" />
-        <p>Location: {{ character.location.name }}</p>
+      <h2>{{ character ? character.name : 'Loading...' }}</h2>
+      <p>{{ character ? character.species : 'Loading...' }}</p>
+      <img :src="character ? character.image : ''" :alt="character ? character.name : 'Loading...'" />
+      <p>Location: {{ character && character.location ? character.location.name : 'Loading...' }}</p>
     </div>
-</template>
+  </template>
+  
   
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router'
-import { useCharactersStore } from '../stores/CharactersStore';
+import axios from 'axios';
 
 const { params } = useRoute();
-const charactersStore = useCharactersStore();
+
+const character = ref({});
 
 onMounted(async () => {
-  console.log(charactersStore.characters.find(char => char.id === parseInt(params.id)) || {})
-});
-
-const character = computed(() => {
-    return charactersStore.characters.find(char => char.id === parseInt(params.id)) || {};
+    const response = await axios.get(`https://rickandmortyapi.com/api/character/${params.id}`)
+    console.log(response.data)
+    character.value = response.data;
 });
 </script>
