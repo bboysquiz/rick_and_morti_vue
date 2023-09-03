@@ -5,37 +5,39 @@ import axios from 'axios'
 export const useCharactersStore = defineStore('characters', () => {
     const characters = ref([])
     const currentPage = ref(1)
-    const itemsPerPage = 20;
     const isLoading = ref(false);
+    const currentSearch = ref('');
+    const currentStatus = ref('');
 
-    // const getCharacters = async () => {
-    //     await axios
-    //         .get(`https://rickandmortyapi.com/api/character`)
-    //         .then((response) => {
-    //             characters.value = response.data.results
-    //         })
-    //         .catch((error) => {
-    //             console.log(error)
-    //         });
-    // }
-    const getCharacters = async (page = 1) => {
+    const getCharacters = async (page = 1, search = '', status = '') => {
+
         try {
             if (isLoading.value) return;
             isLoading.value = true;
-            const response = await axios.get(`https://rickandmortyapi.com/api/character?page=${page}`);
+
+            if (currentSearch.value !== search || currentStatus.value !== status) {
+                characters.value = [];
+                currentSearch.value = search;
+                currentStatus.value = status;
+            }
+
+            let url = `https://rickandmortyapi.com/api/character?page=${page}`;
+            if (search) url += `&name=${search}`;
+            if (status) url += `&status=${status}`;
+
+            const response = await axios.get(url);
             characters.value = [...characters.value, ...response.data.results];
             isLoading.value = false;
-            
+
         } catch (error) {
             console.error(error);
             isLoading.value = false
         }
     };
     const loadNextPage = async () => {
-        console.log('loadnext')
         const nextPage = currentPage.value + 1;
-        await getCharacters(nextPage);
-        
+        await getCharacters(nextPage, currentSearch.value, currentStatus.value);
+
         if (characters.value.length > 0) {
             currentPage.value = nextPage;
         }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useCharactersStore } from '../stores/CharactersStore';
 
 const search = ref('');
@@ -19,30 +19,19 @@ const handleScroll = async (event) => {
   const clientHeight = document.documentElement.clientHeight;
 
   if (scrollHeight - (scrollTop + clientHeight) < 20) {
-    console.log('Loading next page...');  // сообщение для отладки
     await characters.loadNextPage();
   }
 };
 
-const filteredCharacters = computed(() => {
-  let filteredChars = characters.characters;
-  if (search.value) {
-    filteredChars = filteredChars.filter(character =>
-      character.name.toLowerCase().includes(search.value.toLowerCase())
-    );
-  }
-  if (status.value) {
-    filteredChars = filteredChars.filter(character =>
-      character.status.toLowerCase() === status.value.toLowerCase()
-    );
-  }
-
-  return filteredChars;
-});
-
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
+
+watch([search, status], async () => {
+  characters.characters.value = [];
+  
+  await characters.getCharacters(1, search.value, status.value);
+}, { immediate: true });
 
 </script>
 
@@ -57,7 +46,7 @@ onUnmounted(() => {
     </select>
     <div class="list-wrapper"></div>
     <ul class="virtual-list-container" ref="container" @scroll="handleScroll">
-      <li v-for="character in filteredCharacters" :key="character.id" class="virtual-list-item">
+      <li v-for="character in characters.characters" :key="character.id" class="virtual-list-item">
         <router-link v-if="character.id" :to="{ name: 'character', params: { id: character.id } }">
           <h2>{{ character.name }}</h2>
         </router-link>
