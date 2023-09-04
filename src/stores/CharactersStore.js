@@ -43,5 +43,7 @@ export const useCharactersStore = defineStore('characters', () => {
         }
     };
 
-    return { characters, currentPage, getCharacters, loadNextPage }
+    return { characters, currentPage, getCharacters, loadNextPage, currentSearch, currentStatus }
+}, {
+    persist: true
 })

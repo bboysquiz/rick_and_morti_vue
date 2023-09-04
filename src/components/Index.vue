@@ -9,7 +9,6 @@ const characters = useCharactersStore()
 
 onMounted(async () => {
   await characters.getCharacters();
-  await characters.loadNextPage();
   window.addEventListener("scroll", handleScroll);
 });
 
@@ -29,7 +28,7 @@ onUnmounted(() => {
 
 watch([search, status], async () => {
   characters.characters.value = [];
-  
+
   await characters.getCharacters(1, search.value, status.value);
 }, { immediate: true });
 

@@ -15,7 +15,7 @@
 </template>
   
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router'
 import { useCharactersStore } from '../stores/CharactersStore';
 import axios from 'axios';
