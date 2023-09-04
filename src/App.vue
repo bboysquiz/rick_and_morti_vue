@@ -4,9 +4,14 @@
 
 <template>
   <div>
-    <H1>Rick And Morti</H1>
+    <h1>Rick And Morti</h1>
     <router-view></router-view>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+h1 {
+  width: 100%;
+  text-align: center;
+}
+</style>

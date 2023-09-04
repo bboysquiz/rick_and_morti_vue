@@ -35,33 +35,95 @@ watch([search, status], async () => {
 </script>
 
 <template>
-  <div>
-    <input v-model="search" placeholder="Search by name" />
-    <select v-model="status">
-      <option value="">Any Status</option>
-      <option value="alive">Alive</option>
-      <option value="dead">Dead</option>
-      <option value="unknown">Unknown</option>
-    </select>
-    <div class="list-wrapper"></div>
-    <ul class="virtual-list-container" ref="container" @scroll="handleScroll">
-      <li v-for="character in characters.characters" :key="character.id" class="virtual-list-item">
-        <router-link v-if="character.id" :to="{ name: 'character', params: { id: character.id } }">
-          <h2>{{ character.name }}</h2>
-        </router-link>
-        <p>{{ character.species }}</p>
-        <img :src="character.image" :alt="character.name" />
-        <ul>
-          <li v-if="character.episode" v-for="episode in character.episode.slice(0, 5)" :key="episode">
-            <router-link v-if="episode.match(/\d+/)"
-              :to="{ name: 'episode', params: { id: episode.match(/\d+/).toString() } }">
-              Episode {{ episode.match(/\d+/).toString() }}
-            </router-link>
-          </li>
-        </ul>
-      </li>
-    </ul>
+  <div class="main">
+    <div class="filter-wrapper">
+      <input class="input-search" v-model="search" placeholder="Search by name" />
+      <select class="select-status" v-model="status">
+        <option value="">Any Status</option>
+        <option value="alive">Alive</option>
+        <option value="dead">Dead</option>
+        <option value="unknown">Unknown</option>
+      </select>
+    </div>
+      <ul class="list-wrapper" @scroll="handleScroll">
+        <li v-for="character in characters.characters" :key="character.id" class="list-item">
+          <router-link class="item-title" v-if="character.id" :to="{ name: 'character', params: { id: character.id } }">
+            <h2>{{ character.name }}</h2>
+          </router-link>
+          <p class="item-species">Разновидность: {{ character.species }}</p>
+          <img class="item-img" :src="character.image" :alt="character.name" />
+          <ul class="list-wrapper">
+            <li class="list-item" v-if="character.episode" v-for="episode in character.episode.slice(0, 5)" :key="episode">
+              <router-link class="item-title" v-if="episode.match(/\d+/)"
+                :to="{ name: 'episode', params: { id: episode.match(/\d+/).toString() } }">
+                Episode {{ episode.match(/\d+/).toString() }}
+              </router-link>
+            </li>
+          </ul>
+        </li>
+      </ul>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.main {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.input-search {
+  width: 300px;
+  height: 30px;
+  border: 0;
+  padding: 0 0 0 10px;
+  outline: 1px solid black;
+  margin-top: 1px;
+  border-radius: 10px;
+}
+
+.select-status {
+  width: 300px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+.filter-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.list-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.list-item {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+}
+.item-title {
+  text-decoration: none;
+  width: 100%;
+  text-align: center;
+  color: #000;
+  cursor: pointer;
+}
+.item-species {
+  width: 100%;
+  text-align: center;
+  color: #000;
+}
+h2 {
+  margin: 0;
+}
+.item-img {
+  width: 250px;
+  height: 300px;
+}
+</style>
